@@ -32,7 +32,8 @@ class AutoCorrelation(nn.Module):
         self.output_attention = output_attention
         self.dropout = nn.Dropout(attention_dropout)
         self.agg = None
-        self.use_wavelet = configs.wavelet
+        # self.use_wavelet = configs.wavelet
+        self.use_wavelet = None
 
     # @decor_time
     def time_delay_agg_training(self, values, corr):

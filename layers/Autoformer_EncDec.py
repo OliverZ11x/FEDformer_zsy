@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
-from layers.SelfAttention_Family import FullAttention
+from layers.SelfAttention_Family import FullAttention, ProbAttention
 
 
 class my_Layernorm(nn.Module):
@@ -30,8 +30,12 @@ class moving_avg(nn.Module):
 
     def forward(self, x):
         # padding on the both ends of time series
-        front = x[:, 0:1, :].repeat(1, self.kernel_size - 1-math.floor((self.kernel_size - 1) // 2), 1)
-        end = x[:, -1:, :].repeat(1, math.floor((self.kernel_size - 1) // 2), 1)
+        if isinstance(self.kernel_size, list):
+            front = x[:, 0:1, :].repeat(1, self.kernel_size[0] - 1-math.floor((self.kernel_size[0] - 1) // 2), 1)
+            end = x[:, -1:, :].repeat(1, math.floor((self.kernel_size[0] - 1) // 2), 1)
+        else:
+            front = x[:, 0:1, :].repeat(1, self.kernel_size - 1-math.floor((self.kernel_size - 1) // 2), 1)
+            end = x[:, -1:, :].repeat(1, math.floor((self.kernel_size - 1) // 2), 1)
         x = torch.cat([front, x, end], dim=1)
         x = self.avg(x.permute(0, 2, 1))
         x = x.permute(0, 2, 1)
