@@ -6,6 +6,9 @@ __pycache__/
 results/
 test_results/
 checkpoints/
+~$results.xlsx
+result.txt
+
 
 # Repo-specific GitIgnore
 
@@ -15,5 +18,3 @@ checkpoints/
 *.JPG
 *.JPEG
 *.pdf
-
-~$results.xlsx
