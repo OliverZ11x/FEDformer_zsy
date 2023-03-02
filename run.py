@@ -17,9 +17,10 @@ def main():
 
     # basic config
     parser.add_argument('--is_training', type=int, default=1, help='status')
-    parser.add_argument('--task_id', type=str, default='test', help='task id')
-    parser.add_argument('--model', type=str, default='FEDformer',
-                        help='model name, options: [FEDformer, Autoformer, Informer, Transformer]')
+    parser.add_argument('--task_id', type=str, default='3_2_3PM', help='task id')
+    parser.add_argument('--model_id', type=str, default='test', help='model id')
+    parser.add_argument('--model', type=str, default='Informer',
+                        help='model name, options: [FEDformer, Autoformer, Informer, Transformer, Mymodel, InAutofomer]')
 
     # supplementary config for FEDformer model
     parser.add_argument('--version', type=str, default='Fourier',
@@ -31,24 +32,25 @@ def main():
     parser.add_argument('--base', type=str, default='legendre', help='mwt base')
     parser.add_argument('--cross_activation', type=str, default='tanh',
                         help='mwt cross atention activation function tanh or softmax')
+    parser.add_argument('--wavelet', type=bool, default=False, help='weather use the wavelet module')
 
     # data loader
-    parser.add_argument('--data', type=str, default='ETTh1', help='dataset type')
-    parser.add_argument('--root_path', type=str, default='./dataset/ETT/', help='root path of the data file')
-    parser.add_argument('--data_path', type=str, default='ETTh1.csv', help='data file')
-    parser.add_argument('--features', type=str, default='M',
+    parser.add_argument('--data', type=str, default='BP', help='dataset type')
+    parser.add_argument('--root_path', type=str, default='./data/', help='root path of the data file')
+    parser.add_argument('--data_path', type=str, default='BP_test.csv', help='data file')
+    parser.add_argument('--features', type=str, default='S',
                         help='forecasting task, options:[M, S, MS]; M:multivariate predict multivariate, '
                              'S:univariate predict univariate, MS:multivariate predict univariate')
-    parser.add_argument('--target', type=str, default='OT', help='target feature in S or MS task')
+    parser.add_argument('--target', type=str, default='aortic', help='target feature in S or MS task')
     parser.add_argument('--freq', type=str, default='h',
                         help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, '
                              'b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
     parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
 
     # forecasting task
-    parser.add_argument('--seq_len', type=int, default=96, help='input sequence length')
-    parser.add_argument('--label_len', type=int, default=48, help='start token length')
-    parser.add_argument('--pred_len', type=int, default=96, help='prediction sequence length')
+    parser.add_argument('--seq_len', type=int, default=500, help='input sequence length')
+    parser.add_argument('--label_len', type=int, default=500, help='start token length')
+    parser.add_argument('--pred_len', type=int, default=0, help='prediction sequence length')
     # parser.add_argument('--cross_activation', type=str, default='tanh'
 
     # model define
@@ -64,7 +66,7 @@ def main():
     parser.add_argument('--factor', type=int, default=1, help='attn factor')
     parser.add_argument('--distil', action='store_false',
                         help='whether to use distilling in encoder, using this argument means not using distilling',
-                        default=True)
+                        default=False) # 为什么不用distilling
     parser.add_argument('--dropout', type=float, default=0.05, help='dropout')
     parser.add_argument('--embed', type=str, default='timeF',
                         help='time features encoding, options:[timeF, fixed, learned]')
@@ -73,11 +75,11 @@ def main():
     parser.add_argument('--do_predict', action='store_true', help='whether to predict unseen future data')
 
     # optimization
-    parser.add_argument('--num_workers', type=int, default=10, help='data loader num workers')
+    parser.add_argument('--num_workers', type=int, default=0, help='data loader num workers')
     parser.add_argument('--itr', type=int, default=3, help='experiments times')
     parser.add_argument('--train_epochs', type=int, default=10, help='train epochs')
     parser.add_argument('--batch_size', type=int, default=32, help='batch size of train input data')
-    parser.add_argument('--patience', type=int, default=3, help='early stopping patience')
+    parser.add_argument('--patience', type=int, default=1, help='early stopping patience')
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='optimizer learning rate')
     parser.add_argument('--des', type=str, default='test', help='exp description')
     parser.add_argument('--loss', type=str, default='mse', help='loss function')
@@ -99,6 +101,25 @@ def main():
         device_ids = args.devices.split(',')
         args.device_ids = [int(id_) for id_ in device_ids]
         args.gpu = args.device_ids[0]
+
+    data_parser = {
+        'ETTh1':{'data':'ETTh1.csv','T':'OT','M':[7,7,7],'S':[1,1,1],'MS':[7,7,1]},
+        'ETTh2':{'data':'ETTh2.csv','T':'OT','M':[7,7,7],'S':[1,1,1],'MS':[7,7,1]},
+        'ETTm1':{'data':'ETTm1.csv','T':'OT','M':[7,7,7],'S':[1,1,1],'MS':[7,7,1]},
+        'ETTm2':{'data':'ETTm2.csv','T':'OT','M':[7,7,7],'S':[1,1,1],'MS':[7,7,1]},
+        'WTH':{'data':'WTH.csv','T':'WetBulbCelsius','M':[12,12,12],'S':[1,1,1],'MS':[12,12,1]},
+        'ECL':{'data':'ECL.csv','T':'MT_320','M':[321,321,321],'S':[1,1,1],'MS':[321,321,1]},
+        'Solar':{'data':'solar_AL.csv','T':'POWER_136','M':[137,137,137],'S':[1,1,1],'MS':[137,137,1]},
+        'BP':{'data':'BP.csv','T':'aortic','M':[7,7,7],'S':[1,1,1],'MS':[7,7,1]},
+    }
+    
+    if args.data in data_parser.keys():
+        data_info = data_parser[args.data]
+        args.data_path = data_info['data']
+        args.target = data_info['T']
+        args.enc_in, args.dec_in, args.c_out = data_info[args.features]
+
+
 
     print('Args in experiment:')
     print(args)
