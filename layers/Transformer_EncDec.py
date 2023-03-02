@@ -51,11 +51,12 @@ class EncoderLayer(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, attn_layers, conv_layers=None, norm_layer=None):
+    def __init__(self, attn_layers, conv_layers=None, norm_layer=None, projection=None):
         super(Encoder, self).__init__()
         self.attn_layers = nn.ModuleList(attn_layers)
         self.conv_layers = nn.ModuleList(conv_layers) if conv_layers is not None else None
         self.norm = norm_layer
+        self.projection = projection # bug修改
 
     def forward(self, x, attn_mask=None):
         # x [B, L, D]
@@ -74,7 +75,10 @@ class Encoder(nn.Module):
 
         if self.norm is not None:
             x = self.norm(x)
-
+        
+        # bug修改
+        if self.projection is not None:
+            x = self.projection(x)
         return x, attns
 
 

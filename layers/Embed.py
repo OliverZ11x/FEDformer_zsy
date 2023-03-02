@@ -146,3 +146,15 @@ class DataEmbedding_wo_pos(nn.Module):
         # except:
         #     a = 1
         return self.dropout(x)
+
+
+class DataEmbedding_onlyvalue(nn.Module):
+    def __init__(self, c_in, d_model, embed_type='fixed', freq='h', dropout=0.1):
+        super(DataEmbedding_onlyvalue, self).__init__()
+
+        self.value_embedding = TokenEmbedding(c_in=c_in, d_model=d_model)
+        self.dropout = nn.Dropout(p=dropout)
+
+    def forward(self, x, x_mark):
+        x = self.value_embedding(x)
+        return self.dropout(x)
