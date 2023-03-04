@@ -17,13 +17,13 @@ def main():
 
     # basic config
     parser.add_argument('--is_training', type=int, default=1, help='status')
-    parser.add_argument('--task_id', type=str, default='3_2_3PM', help='task id')
+    parser.add_argument('--task_id', type=str, default='3_4_1PM', help='task id')
     parser.add_argument('--model_id', type=str, default='test', help='model id')
-    parser.add_argument('--model', type=str, default='Informer',
+    parser.add_argument('--model', type=str, default='FEDformer',
                         help='model name, options: [FEDformer, Autoformer, Informer, Transformer, Mymodel, InAutofomer]')
 
     # supplementary config for FEDformer model
-    parser.add_argument('--version', type=str, default='Fourier',
+    parser.add_argument('--version', type=str, default='Wavelets',
                         help='for FEDformer, there are two versions to choose, options: [Fourier, Wavelets]')
     parser.add_argument('--mode_select', type=str, default='random',
                         help='for FEDformer, there are two mode selection method, options: [random, low]')
@@ -32,7 +32,7 @@ def main():
     parser.add_argument('--base', type=str, default='legendre', help='mwt base')
     parser.add_argument('--cross_activation', type=str, default='tanh',
                         help='mwt cross atention activation function tanh or softmax')
-    parser.add_argument('--wavelet', type=bool, default=False, help='weather use the wavelet module')
+    parser.add_argument('--wavelet', type=bool, default=True, help='weather use the wavelet module')
 
     # data loader
     parser.add_argument('--data', type=str, default='BP', help='dataset type')
