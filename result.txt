@@ -40,3 +40,9 @@ mse:0.04636339843273163, mae:0.16699743270874023
 3_2_3PM_Informer_random_modes64_BP_ftS_sl500_ll500_pl0_dm512_nh8_el2_dl1_df2048_fc1_ebtimeF_dtFalse_test_0  
 mse:0.12603583931922913, mae:0.267594575881958
 
+3_2_3PM_Informer_random_modes64_BP_ftS_sl500_ll500_pl0_dm512_nh8_el2_dl1_df2048_fc1_ebtimeF_dtFalse_test_0  
+mse:0.043312180787324905, mae:0.1463319957256317
+
+3_2_3PM_Informer_random_modes64_BP_ftS_sl500_ll500_pl0_dm512_nh8_el2_dl1_df2048_fc1_ebtimeF_dtFalse_test_1  
+mse:0.03234035149216652, mae:0.12680214643478394
+
